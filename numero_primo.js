@@ -1,4 +1,5 @@
 // Escreva uma função que receba um número inteiro positivo como entrada e retorne true se ele for um número primo ou false se não for. Um número primo é aquele que é divisível apenas por 1 e por ele mesmo.
+// Solução -> Algoritmo de força bruta que divide um número por todos os seu antecessores para buscar encontrar divisores diferentes de 1 e do próprio número, descaracterizando ou caracterizando como um número primo.
 const chalk = require('chalk')
 const readline = require('readline')
 
@@ -9,10 +10,10 @@ const rl = readline.createInterface({
 
 function calculaAmostragem(num){
   const ordemGrandeza = Number(Number(num).toExponential().toString().split("e")[1]) // retorna a OG do numero
-  const OGMinima = 6 // Utilizada para definir a partir de qual valor as mensagens de estimativas serão exibidas
-  const divisor = ordemGrandeza > OGMinima ? Number(1 + "e" + (ordemGrandeza-OGMinima)) : 1 // Define um valor adequado para retornar uma estimativa ágil de acordo com a OG
+  const OGMinima = 6 // Utilizada para definir a partir de qual OG as mensagens de estimativas serão exibidas
+  const divisor = ordemGrandeza > OGMinima ? Number(1 + "e" + (ordemGrandeza-OGMinima)) : 1 // Define uma amostragem adequada para retornar uma estimativa ágil de acordo com a OG
   const amostra = Math.floor(num/divisor)
-  const limite = num - amostra // zerá zero quando a OG do número for baixa
+  const limite = num - amostra // zerá zero quando a OG do número for baixa. Usada para exibir a mensagem na hora adequada.
   return {divisor, amostra, limite}
 }
 
@@ -22,7 +23,11 @@ function calculaPerfomance(inicio, fim, multiplicador = 1){
 
 function exibeEstimativa(inicio, momentoAtual, multiplicador) {
   const estimativa = calculaPerfomance(inicio, momentoAtual, multiplicador)
-  console.log(chalk.yellow("Calculando..."),"Estimativa de ~", chalk.yellow((estimativa/1000).toFixed(2)), "segundos")
+  console.log(
+      chalk.yellow("Calculando..."),
+      "Estimativa de ~", 
+      chalk.yellow((estimativa/1000).toFixed(2)), 
+      "segundos")
 }
 
 function ehNumeroPrimo(num){
@@ -57,9 +62,9 @@ function ehNumeroPrimo(num){
   }
 }
 
-function ehInteiroPositivo(input){
+function ehNumeroInteiroPositivo(input){
   const ehNumero = Number(input)
-  if(ehNumero !== NaN){
+  if(ehNumero){
     if(Number.isInteger(ehNumero)){
       if(ehNumero > 0){
         return true
@@ -76,20 +81,23 @@ function ehInteiroPositivo(input){
 }
 
 function verificaSePrimo(num) {
-  ehInteiroPositivo(num)
-  return ehNumeroPrimo(num)
+  return ehNumeroInteiroPositivo(num) ? ehNumeroPrimo(num) : ""
 }
 
 rl.question(`Digite um ${chalk.bold.underline("número inteiro positivo")} qualquer para verificar se ele é primo ou não: `, (answer) => {
   console.log("Você digitou: ", chalk.yellow(answer))
   
-  const resultado = verificaSePrimo(answer)
+  try {
+    const resultado = verificaSePrimo(answer)
+    resultado.primo ? 
+      console.log(chalk.bgGreen.bold(`${answer} é primo`)) 
+    : console.log(chalk.bgRed(chalk.bgRed.bold(`${answer} não é primo`), "e possui os seguintes divisores (além de 1 e ele mesmo):"), resultado.divisores) // caso não seja primo retorna os divisores do números, além de 1 e ele mesmo
+    
+    console.log("Operação realizada em", chalk.yellow((resultado.duracao/1000).toFixed(4)), "segundos")
+  } catch (error) {
+    console.error(error.message)
+  }
   
-  resultado.primo ? 
-    console.log(chalk.bgGreen.bold(`${answer} é primo`)) 
-  : console.log(chalk.bgRed(chalk.bgRed.bold(`${answer} não é primo`), "e possui os seguintes divisores:"), resultado.divisores)
-  
-  console.log("Operação realizada em", chalk.yellow((resultado.duracao/1000).toFixed(4)), "segundos")
   rl.close()
 })
 
