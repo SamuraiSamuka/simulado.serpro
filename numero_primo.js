@@ -7,58 +7,92 @@ const rl = readline.createInterface({
   output: process.stdout
 })
 
+function calculaAmostragem(num){
+  const ordemGrandeza = Number(Number(num).toExponential().toString().split("e")[1]) // retorna a OG do numero
+  const OGMinima = 6 // Utilizada para definir a partir de qual valor as mensagens de estimativas serão exibidas
+  const divisor = ordemGrandeza > OGMinima ? Number(1 + "e" + (ordemGrandeza-OGMinima)) : 1 // Define um valor adequado para retornar uma estimativa ágil de acordo com a OG
+  const amostra = Math.floor(num/divisor)
+  const limite = num - amostra // zerá zero quando a OG do número for baixa
+  return {divisor, amostra, limite}
+}
+
+function calculaPerfomance(inicio, fim, multiplicador = 1){
+  return (fim - inicio) * multiplicador
+}
+
+function exibeEstimativa(inicio, momentoAtual, multiplicador) {
+  const estimativa = calculaPerfomance(inicio, momentoAtual, multiplicador)
+  console.log(chalk.yellow("Calculando..."),"Estimativa de ~", chalk.yellow((estimativa/1000).toFixed(2)), "segundos")
+}
+
 function ehNumeroPrimo(num){
   // cálculo de performance inicial
+  const amostragem = calculaAmostragem(num)
   const inicio = performance.now()
-  const ninetyFivePerCent = num - Math.ceil(num/20)
-
+  
   if(num === 1) {
-    // cálculo de performance final
     const fim = performance.now()
-    const duracao = fim - inicio
-
-    return {primo:true, divisores: [], duracao}
+    return { primo:true, divisores: [], duracao: calculaPerfomance(inicio, fim) }
+    
   } else {
     let primo = true
     let divisores = []
-    console.log(chalk.yellow("Calculando..."))
     for(let i = num - 1; i > 1 ; i--){
       if (num % i === 0) {
         primo = false
         divisores.push(i)
       }
-      if (i === ninetyFivePerCent) {
+      if (i === amostragem.limite) {
         // Estimativa de performance
-        const now = performance.now()
-        const estimativa = (now - inicio) * 20
-        console.log("Estimativa de execução de", estimativa, "milissegundos")
+        const agora = performance.now()
+        exibeEstimativa(inicio, agora, amostragem.divisor)
       }
     }
-    // cálculo de performance final
+
+    // Cálculo de performance final
     const fim = performance.now()
-    const duracao = fim - inicio
+    const duracao = calculaPerfomance(inicio, fim)
 
     return {primo, divisores, duracao}
   }
 }
 
-function verificaSePrimo(num) {
-  const numConvertido = Number(num)
-  if (numConvertido) {
-    if (numConvertido > 0) {
-      return ehNumeroPrimo(numConvertido)
+function ehInteiroPositivo(input){
+  const ehNumero = Number(input)
+  if(ehNumero !== NaN){
+    if(Number.isInteger(ehNumero)){
+      if(ehNumero > 0){
+        return true
+      } else {
+        throw new Error(chalk.red("Input inválido: Não é um inteiro positivo."))
+      }
     } else {
-      console.log("O número tem que ser um inteiro positivo")
+      throw new Error(chalk.red("Input inválido: Não é um número inteiro."))
     }
+
   } else {
-    console.log("Erro de tipo de dado")
+    throw new Error(chalk.red("Input inválido: Não é um número."))
   }
 }
 
-rl.question("Digite um número inteiro positivo qualquer para verificar se ele é primo ou não: ", (answer) => {
+function verificaSePrimo(num) {
+  ehInteiroPositivo(num)
+  return ehNumeroPrimo(num)
+}
+
+rl.question(`Digite um ${chalk.bold.underline("número inteiro positivo")} qualquer para verificar se ele é primo ou não: `, (answer) => {
   console.log("Você digitou: ", chalk.yellow(answer))
+  
   const resultado = verificaSePrimo(answer)
-  resultado.primo ? console.log(chalk.bgGreen.bold(`${answer} é primo`)) : console.log(chalk.bgRed(chalk.bgRed.bold(`${answer} não é primo`), "e possui os seguintes divisores:"), resultado.divisores)
-  console.log("Operação realizada em", chalk.yellow(resultado.duracao.toFixed(4)), "milissegundos")
+  
+  resultado.primo ? 
+    console.log(chalk.bgGreen.bold(`${answer} é primo`)) 
+  : console.log(chalk.bgRed(chalk.bgRed.bold(`${answer} não é primo`), "e possui os seguintes divisores:"), resultado.divisores)
+  
+  console.log("Operação realizada em", chalk.yellow((resultado.duracao/1000).toFixed(4)), "segundos")
   rl.close()
 })
+
+// função 1 verificação se o input é adequado: um número inteiro positivo
+
+// função 2 verifica se é um número primo
