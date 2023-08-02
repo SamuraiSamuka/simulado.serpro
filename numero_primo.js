@@ -26,8 +26,7 @@ function exibeEstimativa(inicio, momentoAtual, multiplicador) {
   console.log(
       chalk.yellow("Calculando..."),
       "Estimativa de ~", 
-      chalk.yellow((estimativa/1000).toFixed(2)), 
-      "segundos")
+      chalk.yellow(convertemMilissegundos(estimativa)))
 }
 
 function ehNumeroPrimo(num){
@@ -84,6 +83,27 @@ function verificaSePrimo(num) {
   return ehNumeroInteiroPositivo(num) ? ehNumeroPrimo(num) : ""
 }
 
+function convertemMilissegundos(milissegundos) {
+  const horas_ref = 3600000
+  const minutos_ref = 60000
+  const segundos_ref = 1000
+
+  const horas = Math.floor(milissegundos / horas_ref)
+  const horas_resto = milissegundos % horas_ref
+  const minutos = Math.floor(horas_resto/ minutos_ref)
+  const minutos_resto = horas_resto % minutos_ref
+  const segundos = Math.floor(minutos_resto / segundos_ref)
+  const segundos_resto = minutos_resto % segundos_ref
+
+  let tempo = ""
+  tempo += `${segundos_resto.toFixed(2)}ms`
+  segundos ? tempo =`${segundos}s:` + tempo : ""
+  minutos ? tempo = `${minutos}m:` + tempo : ""
+  horas ? tempo = `${horas}H:` + tempo : ""
+  // `${horas}H:${minutos}m:${segundos}s:${segundos_resto.toFixed(4)}ms`
+  return tempo
+}
+
 rl.question(`Digite um ${chalk.bold.underline("número inteiro positivo")} qualquer para verificar se ele é primo ou não: `, (answer) => {
   console.log("Você digitou: ", chalk.yellow(answer))
   
@@ -93,7 +113,7 @@ rl.question(`Digite um ${chalk.bold.underline("número inteiro positivo")} qualq
       console.log(chalk.bgGreen.bold(`${answer} é primo`)) 
     : console.log(chalk.bgRed(chalk.bgRed.bold(`${answer} não é primo`), "e possui os seguintes divisores (além de 1 e ele mesmo):"), resultado.divisores) // caso não seja primo retorna os divisores do números, além de 1 e ele mesmo
     
-    console.log("Operação realizada em", chalk.yellow((resultado.duracao/1000).toFixed(4)), "segundos")
+    console.log("Operação realizada em", chalk.yellow(convertemMilissegundos(resultado.duracao)))
   } catch (error) {
     console.error(error.message)
   }

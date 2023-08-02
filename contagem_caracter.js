@@ -1,0 +1,1 @@
+// Escreva uma função que receba uma string como entrada e retorne um objeto contendo a contagem de cada caractere (não contabilizando espaços em branco). O objeto resultante deve ter a contagem de cada caractere como valor e o caractere como chave

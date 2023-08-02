@@ -68,12 +68,10 @@ Simulado de Prova Prática do Serpro - JavaScript (Nível Intermediário):
 
 3 - Escreva uma função que receba um número inteiro positivo como entrada e retorne true se ele for um número primo ou false se não for. Um número primo é aquele que é divisível apenas por 1 e por ele mesmo. [resolvido]
 
-4 - Desenvolva uma função que receba um array de objetos representando produtos, onde cada objeto possui um nome e um preço. A função deve calcular e retornar o preço total de todos os produtos no array.
+4 - Desenvolva uma função que receba um array de objetos representando produtos, onde cada objeto possui um nome e um preço. A função deve calcular e retornar o preço total de todos os produtos no array. [resolvido]
 
     Exemplo de entrada:
 
-    javascript
-    Copy code
     const produtos = [
       { nome: "Camiseta", preco: 25.00 },
       { nome: "Calça", preco: 50.00 },
@@ -86,8 +84,6 @@ Exemplo de entrada: "abracadabra"
 
     Exemplo de saída:
 
-    javascript
-    Copy code
     {
       a: 5,
       b: 2,
